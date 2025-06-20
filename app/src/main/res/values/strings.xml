@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">Kuralist</string>
+    
+    <!-- General -->
+    <string name="welcome">Welcome to Kuralist</string>
+    <string name="search_schools">Search schools</string>
+    <string name="schools">Schools</string>
+    <string name="map">Map</string>
+    <string name="favorites">Favorites</string>
+    <string name="profile">Profile</string>
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    
+    <!-- Authentication -->
+    <string name="login">Login</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="already_have_account">Already have an account? Sign In</string>
+    <string name="dont_have_account">Don\'t have an account? Sign Up</string>
+    
+    <!-- School Information -->
+    <string name="academic_performance">Academic Performance</string>
+    <string name="demographics">Demographics</string>
+    <string name="contact_info">Contact Information</string>
+    <string name="address">Address</string>
+    <string name="boarding_facilities">Boarding Facilities</string>
+    <string name="school_details">School Details</string>
+    <string name="total_students">Total Students</string>
+    <string name="school_type">School Type</string>
+    <string name="authority">Authority</string>
+    <string name="decile">Decile</string>
+    
+    <!-- Filters -->
+    <string name="filter_by_city">Filter by City</string>
+    <string name="filter_by_suburb">Filter by Suburb</string>
+    <string name="filter_by_type">Filter by Type</string>
+    <string name="filter_by_authority">Filter by Authority</string>
+    <string name="clear_filters">Clear Filters</string>
+    <string name="apply_filters">Apply Filters</string>
+    
+    <!-- Errors -->
+    <string name="error_loading_schools">Failed to load schools</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_authentication">Authentication failed</string>
+    <string name="no_schools_found">No schools found</string>
+    <string name="try_adjusting_search">Try adjusting your search or filters</string>
+</resources>

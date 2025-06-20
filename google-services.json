@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "87901848054",
+    "project_id": "kuralist-b4bdd",
+    "storage_bucket": "kuralist-b4bdd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:87901848054:android:c0635530dfc75cf54047d7",
+        "android_client_info": {
+          "package_name": "com.kuralist.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBes2m2r5W5trmt4LUrGubSFBZIfFVsGnE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

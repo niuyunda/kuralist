@@ -1,0 +1,65 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Kuralist Database Integration Guide
+
+## Room Database Structure
+
+### Core Database Files
+- [app/src/main/java/com/kuralist/app/core/services/database/SchoolDatabase.kt](mdc:app/src/main/java/com/kuralist/app/core/services/database/SchoolDatabase.kt) - Main database class
+- [app/src/main/java/com/kuralist/app/core/services/database/SchoolDao.kt](mdc:app/src/main/java/com/kuralist/app/core/services/database/SchoolDao.kt) - Data access object with queries
+- [app/src/main/java/com/kuralist/app/core/services/database/Converters.kt](mdc:app/src/main/java/com/kuralist/app/core/services/database/Converters.kt) - Type converters for complex data types
+
+### Database Schema
+- **Table**: `schools` 
+- **Primary Key**: `school_number` (mapped to `id` field in [app/src/main/java/com/kuralist/app/core/models/School.kt](mdc:app/src/main/java/com/kuralist/app/core/models/School.kt))
+- **Records**: ~2500 New Zealand schools from Supabase
+
+## Data Flow Architecture
+
+### Supabase ↔ Room Integration
+1. **Remote Source**: [app/src/main/java/com/kuralist/app/core/services/SupabaseManager.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SupabaseManager.kt) - API client
+2. **Service Layer**: [app/src/main/java/com/kuralist/app/core/services/SchoolService.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SchoolService.kt) - Business logic & sync
+3. **Local Storage**: Room Database for offline-first architecture
+
+### Key Service Methods
+- `syncSchoolsFromSupabase()` - Fetch data from API and save to Room
+- `loadSchoolsFromLocal()` - Load cached data from Room
+- `checkAndUpdateSchoolsIfNeeded()` - Smart sync based on timestamps
+
+## Database Configuration
+
+### Dependency Injection
+- [app/src/main/java/com/kuralist/app/core/di/DatabaseModule.kt](mdc:app/src/main/java/com/kuralist/app/core/di/DatabaseModule.kt) - Hilt module for DB dependencies
+- **Note**: Currently disabled due to build issues, needs re-enabling
+
+### Build Configuration
+- **Room Compiler**: Enabled in [app/build.gradle.kts](mdc:app/build.gradle.kts) via `kapt`
+- **Type Converters**: Required for Date/String conversions
+
+## Data Synchronization Strategy
+
+### Offline-First Approach
+1. **App Launch**: Load from Room immediately
+2. **Background Sync**: Check for updates daily
+3. **Manual Refresh**: Pull-to-refresh triggers sync
+4. **Incremental Updates**: Compare timestamps for efficiency
+
+### State Management
+- **StateFlow**: Used in [app/src/main/java/com/kuralist/app/core/services/SchoolService.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SchoolService.kt) for reactive data
+- **Loading States**: `_isLoading`, `_errorMessage`, `_schools` flows
+- **Error Handling**: Comprehensive try-catch with user-friendly messages
+
+## Current Issues & Solutions
+
+### Known Problems
+1. **Hilt Integration**: Temporarily disabled to prevent crashes
+2. **Main Thread Database**: Operations need to be on background threads
+3. **Complex Initialization**: SchoolListScreen was causing crashes during DB setup
+
+### Recommended Fixes
+1. **Re-enable Hilt**: Gradually restore dependency injection
+2. **Repository Pattern**: Consider adding repository layer between Service and DAO
+3. **Pagination**: Implement paging for large datasets (~2500 schools)

@@ -1,0 +1,54 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Kuralist Android App - Architecture & Structure Guide
+
+## Project Overview
+Kuralist is a New Zealand school information app built with modern Android development practices. The Android version mirrors the iOS SwiftUI implementation using Jetpack Compose and MVVM architecture.
+
+## Key Configuration Files
+- [app/build.gradle.kts](mdc:app/build.gradle.kts) - Main app dependencies and build configuration
+- [gradle/libs.versions.toml](mdc:gradle/libs.versions.toml) - Version catalog for dependency management
+- [docs/ANDROID_DEVELOPMENT_DOCUMENT.md](mdc:docs/ANDROID_DEVELOPMENT_DOCUMENT.md) - Complete development specifications
+
+## Architecture Pattern
+- **MVVM** (Model-View-ViewModel) with Jetpack Compose
+- **Backend**: Supabase (PostgreSQL database with REST API)
+- **Local Storage**: Room Database 
+- **State Management**: StateFlow/LiveData
+
+## Project Structure
+```
+app/src/main/java/com/kuralist/app/
+├── application/          # App entry point and main navigation
+├── core/                 # Core functionality and services
+│   ├── models/          # Data models (School, User)
+│   ├── services/        # Business logic and API services
+│   ├── config/          # Configuration settings
+│   └── di/              # Dependency injection modules
+├── features/            # Feature modules
+│   ├── authentication/ # User login/signup
+│   ├── schoollist/      # Main school listing
+│   ├── schoolmap/       # Map view with school markers
+│   ├── favorites/       # User favorites management
+│   └── profile/         # User profile and settings
+├── shared/              # Shared UI components
+│   └── views/          # Reusable UI components
+└── ui/                  # Theme and UI styling
+```
+
+## Critical Entry Points
+- [app/src/main/java/com/kuralist/app/MainActivity.kt](mdc:app/src/main/java/com/kuralist/app/MainActivity.kt) - App entry point
+- [app/src/main/java/com/kuralist/app/application/ContentScreen.kt](mdc:app/src/main/java/com/kuralist/app/application/ContentScreen.kt) - Main navigation logic
+- [app/src/main/java/com/kuralist/app/KuralistApplication.kt](mdc:app/src/main/java/com/kuralist/app/KuralistApplication.kt) - Application class
+
+## Core Services
+- [app/src/main/java/com/kuralist/app/core/services/SupabaseManager.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SupabaseManager.kt) - Supabase client configuration
+- [app/src/main/java/com/kuralist/app/core/services/SchoolService.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SchoolService.kt) - School data management
+- [app/src/main/java/com/kuralist/app/core/config/SupabaseConfig.kt](mdc:app/src/main/java/com/kuralist/app/core/config/SupabaseConfig.kt) - API configuration
+
+## Data Models
+- [app/src/main/java/com/kuralist/app/core/models/School.kt](mdc:app/src/main/java/com/kuralist/app/core/models/School.kt) - Primary school data model
+- [app/src/main/java/com/kuralist/app/core/models/User.kt](mdc:app/src/main/java/com/kuralist/app/core/models/User.kt) - User model with preferences

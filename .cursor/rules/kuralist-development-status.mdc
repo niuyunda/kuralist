@@ -1,0 +1,43 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Kuralist Development Status & Important Notes
+
+## Current Implementation Status
+
+### ✅ Working Components
+- **Authentication Flow**: [app/src/main/java/com/kuralist/app/features/authentication/AuthScreen.kt](mdc:app/src/main/java/com/kuralist/app/features/authentication/AuthScreen.kt) and [app/src/main/java/com/kuralist/app/features/authentication/AuthViewModel.kt](mdc:app/src/main/java/com/kuralist/app/features/authentication/AuthViewModel.kt)
+- **Navigation Structure**: [app/src/main/java/com/kuralist/app/application/MainAppScreen.kt](mdc:app/src/main/java/com/kuralist/app/application/MainAppScreen.kt) with bottom tabs
+- **Supabase Integration**: [app/src/main/java/com/kuralist/app/core/services/SupabaseManager.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SupabaseManager.kt) configured and working
+- **Room Database**: [app/src/main/java/com/kuralist/app/core/services/database/SchoolDatabase.kt](mdc:app/src/main/java/com/kuralist/app/core/services/database/SchoolDatabase.kt) with proper annotations
+
+### 🚧 Temporary Implementations (Need Completion)
+- **School List Screen**: [app/src/main/java/com/kuralist/app/features/schoollist/SchoolListScreen.kt](mdc:app/src/main/java/com/kuralist/app/features/schoollist/SchoolListScreen.kt) - Currently shows placeholder content
+- **Hilt Dependency Injection**: Commented out to prevent build issues, needs re-implementation
+- **Database Integration**: Full integration with [app/src/main/java/com/kuralist/app/core/services/SchoolService.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SchoolService.kt) pending
+
+### 🔧 Recent Fixes Applied
+1. **Crash Fix**: Resolved app crash on sign-in by simplifying [app/src/main/java/com/kuralist/app/features/schoollist/SchoolListScreen.kt](mdc:app/src/main/java/com/kuralist/app/features/schoollist/SchoolListScreen.kt)
+2. **Text Input Fix**: Fixed email/password field state management using `remember` pattern
+3. **Build Configuration**: Re-enabled kapt and Room compiler in [app/build.gradle.kts](mdc:app/build.gradle.kts)
+4. **Import Issues**: Added missing imports for [app/src/main/java/com/kuralist/app/core/services/SchoolService.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SchoolService.kt)
+
+## Important TODOs
+
+### High Priority
+1. **Re-implement School List**: Replace placeholder in [app/src/main/java/com/kuralist/app/features/schoollist/SchoolListScreen.kt](mdc:app/src/main/java/com/kuralist/app/features/schoollist/SchoolListScreen.kt) with full functionality
+2. **Enable Hilt DI**: Restore dependency injection throughout the app
+3. **Database Operations**: Implement proper school data loading from Supabase to Room
+
+### Medium Priority
+1. **Error Handling**: Add comprehensive error handling to [app/src/main/java/com/kuralist/app/core/services/SchoolService.kt](mdc:app/src/main/java/com/kuralist/app/core/services/SchoolService.kt)
+2. **Search & Filtering**: Implement search functionality using [app/src/main/java/com/kuralist/app/shared/views/SearchBar.kt](mdc:app/src/main/java/com/kuralist/app/shared/views/SearchBar.kt)
+3. **Map Integration**: Complete Google Maps implementation in map screen
+
+## Build & Development Notes
+- **Gradle**: Uses version catalogs in [gradle/libs.versions.toml](mdc:gradle/libs.versions.toml)
+- **Kotlin**: Language version 2.0+ with kapt fallback to 1.9
+- **Room Compiler**: Required for database functionality - ensure kapt is enabled
+- **API Keys**: Configured in [app/build.gradle.kts](mdc:app/build.gradle.kts) build config fields
