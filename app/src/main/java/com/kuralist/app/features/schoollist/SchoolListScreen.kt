@@ -3,9 +3,6 @@ package com.kuralist.app.features.schoollist
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kuralist.app.shared.views.SchoolListItem
-import com.kuralist.app.shared.views.filterbar.SchoolFilterBar
+import com.kuralist.app.shared.views.UnifiedSearchAndFilterBar
 import com.kuralist.app.shared.views.filterbar.SchoolFilterState
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -24,6 +21,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun SchoolListScreen(
     modifier: Modifier = Modifier,
     viewModel: SchoolListViewModel,
+    sharedFilterState: SchoolFilterState? = null,
+    favoriteSchoolIds: Set<String> = emptySet(),
     onSchoolClick: (Int) -> Unit = {},
     onFavoriteClick: (Int) -> Unit = {}
 ) {
@@ -33,8 +32,8 @@ fun SchoolListScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     
-    // Add filter state
-    val filterState: SchoolFilterState = viewModel()
+    // Use shared filter state if provided, otherwise create local one
+    val filterState: SchoolFilterState = sharedFilterState ?: viewModel { SchoolFilterState() }
     
     // Bind filter state to school data
     LaunchedEffect(filteredSchools) {
@@ -48,46 +47,11 @@ fun SchoolListScreen(
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        // TopAppBar(
-        //     title = { Text("Schools") }
-        // )
-        
-        // Search Bar
-        OutlinedTextField(
-            value = filterSearchText,
-            onValueChange = { 
-                viewModel.updateSearchText(it) // Keep existing search
-                filterState.updateSearchText(it) // Update filter search too
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            placeholder = { Text("Search schools...") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
-                )
-            },
-            trailingIcon = {
-                if (filterSearchText.isNotEmpty()) {
-                    IconButton(onClick = { 
-                        viewModel.updateSearchText("")
-                        filterState.updateSearchText("")
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "Clear search"
-                        )
-                    }
-                }
-            },
-            singleLine = true
-        )
-        
-        // Add Filter Bar
-        SchoolFilterBar(
+        // Search and Filter Bar
+        UnifiedSearchAndFilterBar(
             filterState = filterState,
+            searchPlaceholder = "Search schools...",
+            isElevated = false,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -193,7 +157,7 @@ fun SchoolListScreen(
                                 school = school,
                                 onSchoolClick = { onSchoolClick(school.id) },
                                 onFavoriteClick = { onFavoriteClick(school.id) },
-                                isFavorite = false
+                                isFavorite = favoriteSchoolIds.contains(school.id.toString())
                             )
                             HorizontalDivider(
                                 modifier = Modifier.padding(start = 16.dp),

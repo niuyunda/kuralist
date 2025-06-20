@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,7 +28,7 @@ import com.kuralist.app.core.models.School
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.database.SchoolDatabase
 import com.kuralist.app.shared.components.PermissionHandler
-import com.kuralist.app.shared.views.filterbar.SchoolFilterBar
+import com.kuralist.app.shared.views.UnifiedSearchAndFilterBar
 import com.kuralist.app.shared.views.filterbar.SchoolFilterState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -45,6 +44,7 @@ private val NEW_ZEALAND_BOUNDS = LatLngBounds(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
+    sharedFilterState: com.kuralist.app.shared.views.filterbar.SchoolFilterState? = null,
     onSchoolClick: ((Int) -> Unit)? = null
 ) {
     val context = LocalContext.current
@@ -56,12 +56,11 @@ fun MapScreen(
     val schoolService = remember { SchoolService(schoolDao) }
     val mapViewModel: MapViewModel = viewModel { MapViewModel(schoolService) }
     
-    // Add filter state
-    val filterState: SchoolFilterState = viewModel()
+    // Use shared filter state if provided, otherwise create local one
+    val filterState: SchoolFilterState = sharedFilterState ?: viewModel { SchoolFilterState() }
     
     // Collect state
     val uiState by mapViewModel.uiState.collectAsStateWithLifecycle()
-    val searchText by mapViewModel.searchText.collectAsStateWithLifecycle()
     val filteredSchools by mapViewModel.filteredSchools.collectAsStateWithLifecycle()
     val selectedSchool by mapViewModel.selectedSchool.collectAsStateWithLifecycle()
     
@@ -72,7 +71,6 @@ fun MapScreen(
     
     // Use filtered schools from filter state
     val finalFilteredSchools by filterState.filteredSchools.collectAsStateWithLifecycle()
-    val filterSearchText by filterState.searchText.collectAsStateWithLifecycle()
     
     // Map state
     val cameraPositionState = rememberCameraPositionState {
@@ -125,66 +123,18 @@ fun MapScreen(
         }
         
         // Search and Filter overlay
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .align(Alignment.TopCenter)
         ) {
-            // Search bar
-            Card(
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                shape = RoundedCornerShape(24.dp)
-            ) {
-                OutlinedTextField(
-                    value = filterSearchText,
-                    onValueChange = { 
-                        mapViewModel.updateSearchText(it) // Keep existing search
-                        filterState.updateSearchText(it) // Update filter search too
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent),
-                    placeholder = { Text("Search schools on map...") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
-                    },
-                    trailingIcon = {
-                        if (filterSearchText.isNotEmpty()) {
-                            IconButton(onClick = { 
-                                mapViewModel.updateSearchText("")
-                                filterState.updateSearchText("")
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "Clear search"
-                                )
-                            }
-                        }
-                    },
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent
-                    )
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            // Filter Bar
-            Card(
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                SchoolFilterBar(
-                    filterState = filterState,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            UnifiedSearchAndFilterBar(
+                filterState = filterState,
+                searchPlaceholder = "Search schools on map...",
+                isElevated = true,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
         
         // My Location button
