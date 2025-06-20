@@ -13,7 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kuralist.app.shared.views.SchoolListItem
+import com.kuralist.app.shared.views.filterbar.SchoolFilterBar
+import com.kuralist.app.shared.views.filterbar.SchoolFilterState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +32,18 @@ fun SchoolListScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    
+    // Add filter state
+    val filterState: SchoolFilterState = viewModel()
+    
+    // Bind filter state to school data
+    LaunchedEffect(filteredSchools) {
+        filterState.bindFiltering(MutableStateFlow(filteredSchools))
+    }
+    
+    // Use filtered schools from filter state instead of viewModel
+    val finalFilteredSchools by filterState.filteredSchools.collectAsStateWithLifecycle()
+    val filterSearchText by filterState.searchText.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier.fillMaxSize()
@@ -38,8 +54,11 @@ fun SchoolListScreen(
         
         // Search Bar
         OutlinedTextField(
-            value = searchText,
-            onValueChange = viewModel::updateSearchText,
+            value = filterSearchText,
+            onValueChange = { 
+                viewModel.updateSearchText(it) // Keep existing search
+                filterState.updateSearchText(it) // Update filter search too
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -51,8 +70,11 @@ fun SchoolListScreen(
                 )
             },
             trailingIcon = {
-                if (searchText.isNotEmpty()) {
-                    IconButton(onClick = { viewModel.updateSearchText("") }) {
+                if (filterSearchText.isNotEmpty()) {
+                    IconButton(onClick = { 
+                        viewModel.updateSearchText("")
+                        filterState.updateSearchText("")
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = "Clear search"
@@ -61,6 +83,12 @@ fun SchoolListScreen(
                 }
             },
             singleLine = true
+        )
+        
+        // Add Filter Bar
+        SchoolFilterBar(
+            filterState = filterState,
+            modifier = Modifier.fillMaxWidth()
         )
 
         // Error Message
@@ -84,7 +112,7 @@ fun SchoolListScreen(
         // Content
         Box(modifier = Modifier.fillMaxSize()) {
             when {
-                isLoading && filteredSchools.isEmpty() -> {
+                isLoading && finalFilteredSchools.isEmpty() -> {
                     // Initial loading state
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -103,7 +131,7 @@ fun SchoolListScreen(
                         }
                     }
                 }
-                filteredSchools.isEmpty() && !isLoading -> {
+                finalFilteredSchools.isEmpty() && !isLoading -> {
                     // Empty state
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -114,8 +142,8 @@ fun SchoolListScreen(
                             modifier = Modifier.padding(32.dp)
                         ) {
                             Text(
-                                text = if (searchText.isNotEmpty()) {
-                                    "No schools found matching \"$searchText\""
+                                text = if (filterSearchText.isNotEmpty()) {
+                                    "No schools found matching \"$filterSearchText\""
                                 } else {
                                     "No schools available"
                                 },
@@ -124,8 +152,8 @@ fun SchoolListScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = if (searchText.isNotEmpty()) {
-                                    "Try adjusting your search terms"
+                                text = if (filterSearchText.isNotEmpty()) {
+                                    "Try adjusting your search terms or filters"
                                 } else {
                                     "Pull down to refresh or check your connection"
                                 },
@@ -150,7 +178,7 @@ fun SchoolListScreen(
                         item {
                             // Results count
                             Text(
-                                text = "${filteredSchools.size} ${if (filteredSchools.size == 1) "school" else "schools"} found",
+                                text = "${finalFilteredSchools.size} ${if (finalFilteredSchools.size == 1) "school" else "schools"} found",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -158,7 +186,7 @@ fun SchoolListScreen(
                         }
                         
                         items(
-                            items = filteredSchools,
+                            items = finalFilteredSchools,
                             key = { school -> school.id }
                         ) { school ->
                             SchoolListItem(

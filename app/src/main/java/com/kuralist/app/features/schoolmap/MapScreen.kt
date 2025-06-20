@@ -29,6 +29,9 @@ import com.kuralist.app.core.models.School
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.database.SchoolDatabase
 import com.kuralist.app.shared.components.PermissionHandler
+import com.kuralist.app.shared.views.filterbar.SchoolFilterBar
+import com.kuralist.app.shared.views.filterbar.SchoolFilterState
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 // Default location - Wellington, New Zealand
@@ -53,11 +56,23 @@ fun MapScreen(
     val schoolService = remember { SchoolService(schoolDao) }
     val mapViewModel: MapViewModel = viewModel { MapViewModel(schoolService) }
     
+    // Add filter state
+    val filterState: SchoolFilterState = viewModel()
+    
     // Collect state
     val uiState by mapViewModel.uiState.collectAsStateWithLifecycle()
     val searchText by mapViewModel.searchText.collectAsStateWithLifecycle()
     val filteredSchools by mapViewModel.filteredSchools.collectAsStateWithLifecycle()
     val selectedSchool by mapViewModel.selectedSchool.collectAsStateWithLifecycle()
+    
+    // Bind filter state to school data
+    LaunchedEffect(filteredSchools) {
+        filterState.bindFiltering(MutableStateFlow(filteredSchools))
+    }
+    
+    // Use filtered schools from filter state
+    val finalFilteredSchools by filterState.filteredSchools.collectAsStateWithLifecycle()
+    val filterSearchText by filterState.searchText.collectAsStateWithLifecycle()
     
     // Map state
     val cameraPositionState = rememberCameraPositionState {
@@ -99,8 +114,8 @@ fun MapScreen(
                 mapViewModel.selectSchool(null)
             }
         ) {
-            // School markers (without clustering for now)
-            filteredSchools.filter { it.coordinates != null }.take(50).forEach { school ->
+            // School markers (use filtered schools from filter state)
+            finalFilteredSchools.filter { it.coordinates != null }.take(50).forEach { school ->
                 SchoolMarker(
                     school = school,
                     isSelected = selectedSchool?.id == school.id,
@@ -109,44 +124,67 @@ fun MapScreen(
             }
         }
         
-        // Search bar overlay
-        Card(
+        // Search and Filter overlay
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .align(Alignment.TopCenter),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            shape = RoundedCornerShape(24.dp)
+                .align(Alignment.TopCenter)
         ) {
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = mapViewModel::updateSearchText,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent),
-                placeholder = { Text("Search schools on map...") },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search"
-                    )
-                },
-                trailingIcon = {
-                    if (searchText.isNotEmpty()) {
-                        IconButton(onClick = { mapViewModel.updateSearchText("") }) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear search"
-                            )
+            // Search bar
+            Card(
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                shape = RoundedCornerShape(24.dp)
+            ) {
+                OutlinedTextField(
+                    value = filterSearchText,
+                    onValueChange = { 
+                        mapViewModel.updateSearchText(it) // Keep existing search
+                        filterState.updateSearchText(it) // Update filter search too
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    placeholder = { Text("Search schools on map...") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    },
+                    trailingIcon = {
+                        if (filterSearchText.isNotEmpty()) {
+                            IconButton(onClick = { 
+                                mapViewModel.updateSearchText("")
+                                filterState.updateSearchText("")
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear search"
+                                )
+                            }
                         }
-                    }
-                },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent
+                    },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Transparent,
+                        unfocusedBorderColor = Color.Transparent
+                    )
                 )
-            )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // Filter Bar
+            Card(
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                SchoolFilterBar(
+                    filterState = filterState,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
         
         // My Location button
@@ -175,7 +213,7 @@ fun MapScreen(
         }
         
         // Results count overlay
-        if (filteredSchools.isNotEmpty()) {
+        if (finalFilteredSchools.isNotEmpty()) {
             Surface(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -185,7 +223,7 @@ fun MapScreen(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)
             ) {
                 Text(
-                    text = "${filteredSchools.count { it.coordinates != null }} schools with locations",
+                    text = "${finalFilteredSchools.count { it.coordinates != null }} schools with locations",
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface
@@ -202,11 +240,11 @@ fun MapScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Surface(
-                    shadowElevation = 8.dp,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    shadowElevation = 8.dp
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier.padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator()
@@ -224,11 +262,10 @@ fun MapScreen(
         uiState.errorMessage?.let { error ->
             Surface(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 80.dp),
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
                 shadowElevation = 8.dp,
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.errorContainer
             ) {
                 Text(
@@ -243,13 +280,79 @@ fun MapScreen(
         
         // Selected school info
         selectedSchool?.let { school ->
-            SchoolInfoBottomSheet(
-                school = school,
-                onDismiss = { mapViewModel.selectSchool(null) },
-                onNavigateToDetail = { schoolId ->
-                    onSchoolClick?.invoke(schoolId)
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shadowElevation = 8.dp,
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                SchoolInfoCard(
+                    school = school,
+                    onSchoolClick = { onSchoolClick?.invoke(school.id) },
+                    onDismiss = { mapViewModel.selectSchool(null) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SchoolInfoCard(
+    school: School,
+    onSchoolClick: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = school.schoolName,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Close"
+                    )
                 }
-            )
+            }
+            
+            if (school.location.isNotEmpty()) {
+                Text(
+                    text = school.location,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            if (school.authority != null) {
+                Text(
+                    text = school.authority!!,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Button(
+                onClick = onSchoolClick,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("View Details")
+            }
         }
     }
 }
@@ -260,108 +363,20 @@ private fun SchoolMarker(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    school.coordinates?.let { coordinates ->
-        Marker(
-            state = MarkerState(position = coordinates),
-            title = school.schoolName,
-            snippet = "${school.location} • ${school.schoolType ?: "School"}",
-            onClick = {
-                onClick()
-                true // Consume the click
-            },
-            icon = getMarkerIcon(school.schoolType, isSelected)
-        )
-    }
-}
-
-@Composable
-private fun SchoolInfoBottomSheet(
-    school: School,
-    onDismiss: () -> Unit,
-    onNavigateToDetail: (Int) -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        shadowElevation = 8.dp,
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            // Drag handle
-            Box(
-                modifier = Modifier
-                    .width(40.dp)
-                    .height(4.dp)
-                    .background(
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                        RoundedCornerShape(2.dp)
-                    )
-                    .align(Alignment.CenterHorizontally)
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // School name
-            Text(
-                text = school.schoolName,
-                style = MaterialTheme.typography.titleLarge
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            // Location and type
-            Text(
-                text = "${school.location} • ${school.schoolType ?: "School"}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            if (school.totalSchoolRoll != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Roll: ${school.totalSchoolRoll} students",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Action buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Close")
-                }
-                
-                Button(
-                    onClick = { onNavigateToDetail(school.id) },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("View Details")
-                }
-            }
+    val coordinates = school.coordinates ?: return
+    
+    Marker(
+        state = MarkerState(position = coordinates),
+        title = school.schoolName,
+        snippet = school.location,
+        onClick = {
+            onClick()
+            false // Don't show default info window
+        },
+        icon = if (isSelected) {
+            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
+        } else {
+            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
         }
-    }
-}
-
-private fun getMarkerIcon(schoolType: String?, isSelected: Boolean): BitmapDescriptor {
-    return when {
-        isSelected -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
-        schoolType?.contains("Primary", ignoreCase = true) == true -> 
-            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
-        schoolType?.contains("Secondary", ignoreCase = true) == true -> 
-            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
-        schoolType?.contains("Composite", ignoreCase = true) == true -> 
-            BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)
-        else -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
-    }
+    )
 } 
