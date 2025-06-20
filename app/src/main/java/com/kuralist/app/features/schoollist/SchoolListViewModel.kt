@@ -2,10 +2,15 @@ package com.kuralist.app.features.schoollist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kuralist.app.core.managers.SchoolFilterManager
+import com.kuralist.app.core.models.FilterSheetItem
 import com.kuralist.app.core.models.School
 import com.kuralist.app.core.services.SchoolService
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+// Removed combine, debounce, distinctUntilChanged, stateIn as they are now in SchoolFilterManager
 import kotlinx.coroutines.launch
 // import javax.inject.Inject
 // import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,88 +18,59 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 // @HiltViewModel
 class SchoolListViewModel constructor(
-    private val schoolService: SchoolService
+    private val schoolService: SchoolService,
+    private val schoolFilterManager: SchoolFilterManager // Added
 ) : ViewModel() {
-    
-    private val _searchText = MutableStateFlow("")
-    val searchText: StateFlow<String> = _searchText.asStateFlow()
+
+    // Delegated to SchoolFilterManager
+    val searchText: StateFlow<String> = schoolFilterManager.searchText
+    val filteredSchools: StateFlow<List<School>> = schoolFilterManager.filteredSchools
+    val activeFilters: StateFlow<Map<String, String>> = schoolFilterManager.activeFilters
+    val activeUEFilter: StateFlow<Boolean> = schoolFilterManager.activeUEFilter
+    val activeInternationalFilter: StateFlow<Boolean> = schoolFilterManager.activeInternationalFilter
+    val filterSheetItem: StateFlow<FilterSheetItem?> = schoolFilterManager.filterSheetItem
+    val filterCategories: List<String> = schoolFilterManager.filterCategories
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
-
-    private val _selectedFilters = MutableStateFlow<Map<String, String>>(emptyMap())
-    val selectedFilters: StateFlow<Map<String, String>> = _selectedFilters.asStateFlow()
-
-    // Debounced search text
-    private val debouncedSearchText = _searchText
-        .debounce(300)
-        .distinctUntilChanged()
-
-    // Filtered schools based on search and filters
-    val filteredSchools: StateFlow<List<School>> = combine(
-        debouncedSearchText,
-        _selectedFilters,
-        schoolService.schools
-    ) { searchText, filters, allSchools ->
-        var result = allSchools
-        
-        // Apply text search
-        if (searchText.isNotBlank()) {
-            result = result.filter { school ->
-                school.searchableText.contains(searchText.lowercase())
-            }
-        }
-        
-        // Apply filters
-        filters.forEach { (filterType, filterValue) ->
-            result = when (filterType) {
-                "city" -> result.filter { it.townCity == filterValue }
-                "suburb" -> result.filter { it.suburb == filterValue }
-                "schoolType" -> result.filter { it.schoolType == filterValue }
-                "authority" -> result.filter { it.authority == filterValue }
-                "gender" -> result.filter { it.genderOfStudents == filterValue }
-                "highAchievers" -> result.filter { school ->
-                    (school.uePassRate2023AllLeavers ?: 0.0) > 70.0 || 
-                    (school.nceaPassRate2023AllLeavers ?: 0.0) > 70.0
-                }
-                "international" -> result.filter { (it.internationalStudents ?: 0) > 0 }
-                "boarding" -> result.filter { it.boardingFacilities == true }
-                else -> result
-            }
-        }
-        
-        result.sortedBy { it.schoolName }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
 
     val isLoading: StateFlow<Boolean> = schoolService.isLoading
     val errorMessage: StateFlow<String?> = schoolService.errorMessage
 
     init {
         loadSchools()
+        schoolFilterManager.cacheAllUniqueValues() // Added
     }
 
     fun updateSearchText(text: String) {
-        _searchText.value = text
+        schoolFilterManager.updateSearchText(text) // Delegated
     }
 
-    fun addFilter(filterType: String, filterValue: String) {
-        val currentFilters = _selectedFilters.value.toMutableMap()
-        currentFilters[filterType] = filterValue
-        _selectedFilters.value = currentFilters
+    // Removed addFilter, removeFilter, clearAllFilters
+
+    // Added methods to interact with SchoolFilterManager
+    fun onSelectCategory(category: String) {
+        schoolFilterManager.showFilterOptionsSheet(category)
     }
 
-    fun removeFilter(filterType: String) {
-        val currentFilters = _selectedFilters.value.toMutableMap()
-        currentFilters.remove(filterType)
-        _selectedFilters.value = currentFilters
+    fun onDismissFilterSheet() {
+        schoolFilterManager.dismissFilterOptionsSheet()
     }
 
-    fun clearAllFilters() {
-        _selectedFilters.value = emptyMap()
+    fun onSetCategoryFilter(category: String, option: String) {
+        schoolFilterManager.setCategoryFilter(category, option)
+    }
+
+    fun onClearCategoryFilter(category: String) {
+        schoolFilterManager.clearCategoryFilter(category)
+    }
+
+    fun onToggleUEFilter() {
+        schoolFilterManager.toggleUEFilter()
+    }
+
+    fun onToggleInternationalFilter() {
+        schoolFilterManager.toggleInternationalFilter()
     }
 
     fun refreshSchools() {
@@ -113,4 +89,4 @@ class SchoolListViewModel constructor(
             schoolService.checkAndUpdateSchoolsIfNeeded()
         }
     }
-} 
+}
