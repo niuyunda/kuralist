@@ -33,11 +33,29 @@ fun AuthScreen(
     val password by actualViewModel.password.collectAsState()
     val confirmPassword by actualViewModel.confirmPassword.collectAsState()
     val isLoading by actualViewModel.isLoading.collectAsState()
-    val errorMessage by actualViewModel.errorMessage.collectAsState()
+    val authError by actualViewModel.authError.collectAsState()
     val isSignUpMode by actualViewModel.isSignUpMode.collectAsState()
     
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+
+    // Convert AuthError to localized string
+    val errorMessage = authError?.let { error ->
+        when (error) {
+            is AuthError.EmailRequired -> stringResource(R.string.email_required)
+            is AuthError.EmailInvalid -> stringResource(R.string.email_invalid)
+            is AuthError.PasswordRequired -> stringResource(R.string.password_required)
+            is AuthError.PasswordTooShort -> stringResource(R.string.password_too_short)
+            is AuthError.PasswordsDoNotMatch -> stringResource(R.string.passwords_do_not_match)
+            is AuthError.EnterEmailAddress -> stringResource(R.string.enter_email_address)
+            is AuthError.EmailVerificationSent -> stringResource(R.string.email_verification_sent)
+            is AuthError.PasswordResetSent -> stringResource(R.string.password_reset_sent)
+            is AuthError.SignUpFailed -> stringResource(R.string.sign_up_failed, error.message)
+            is AuthError.SignInFailed -> stringResource(R.string.sign_in_failed, error.message)
+            is AuthError.SignOutFailed -> stringResource(R.string.sign_out_failed, error.message)
+            is AuthError.PasswordResetFailed -> stringResource(R.string.password_reset_failed, error.message)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -106,7 +124,7 @@ fun AuthScreen(
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) Icons.Default.Info else Icons.Default.Info,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                        contentDescription = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                     )
                 }
             },
@@ -130,7 +148,7 @@ fun AuthScreen(
                     IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                         Icon(
                             imageVector = if (confirmPasswordVisible) Icons.Default.Info else Icons.Default.Info,
-                            contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
+                            contentDescription = if (confirmPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
                         )
                     }
                 },

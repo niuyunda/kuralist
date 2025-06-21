@@ -7,10 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kuralist.app.R
 import com.kuralist.app.features.schools.list.presentation.components.SchoolListItem
 import com.kuralist.app.features.schools.list.presentation.components.search.UnifiedSearchAndFilterBar
 import com.kuralist.app.shared.ui.components.filter.SchoolFilterState
@@ -50,7 +52,7 @@ fun SchoolListScreen(
         // Search and Filter Bar
         UnifiedSearchAndFilterBar(
             filterState = filterState,
-            searchPlaceholder = "Search schools...",
+            searchPlaceholder = stringResource(R.string.search_schools_placeholder),
             isElevated = false,
             modifier = Modifier.fillMaxWidth()
         )
@@ -88,7 +90,7 @@ fun SchoolListScreen(
                             CircularProgressIndicator()
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Loading schools...",
+                                text = stringResource(R.string.loading_schools),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -107,9 +109,9 @@ fun SchoolListScreen(
                         ) {
                             Text(
                                 text = if (filterSearchText.isNotEmpty()) {
-                                    "No schools found matching \"$filterSearchText\""
+                                    stringResource(R.string.no_schools_matching_search, filterSearchText)
                                 } else {
-                                    "No schools available"
+                                    stringResource(R.string.no_schools_available)
                                 },
                                 style = MaterialTheme.typography.titleMedium,
                                 textAlign = TextAlign.Center
@@ -117,9 +119,9 @@ fun SchoolListScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = if (filterSearchText.isNotEmpty()) {
-                                    "Try adjusting your search terms or filters"
+                                    stringResource(R.string.adjust_search_terms)
                                 } else {
-                                    "Pull down to refresh or check your connection"
+                                    stringResource(R.string.pull_to_refresh)
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -129,7 +131,7 @@ fun SchoolListScreen(
                             Button(
                                 onClick = { viewModel.refreshSchools() }
                             ) {
-                                Text("Refresh")
+                                Text(stringResource(R.string.refresh))
                             }
                         }
                     }
@@ -141,8 +143,14 @@ fun SchoolListScreen(
                     ) {
                         item {
                             // Results count
+                            val schoolCount = finalFilteredSchools.size
+                            val schoolText = if (schoolCount == 1) {
+                                stringResource(R.string.school_singular)
+                            } else {
+                                stringResource(R.string.schools_plural)
+                            }
                             Text(
-                                text = "${finalFilteredSchools.size} ${if (finalFilteredSchools.size == 1) "school" else "schools"} found",
+                                text = "$schoolCount $schoolText ${stringResource(R.string.found)}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
@@ -188,7 +196,7 @@ fun SchoolListScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Refreshing...",
+                            text = stringResource(R.string.refreshing),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

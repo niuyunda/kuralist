@@ -6,7 +6,21 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
+
+@Composable
+private fun getLocalizedCategoryName(category: String): String {
+    return when (category) {
+        "City" -> stringResource(R.string.filter_city)
+        "Suburb" -> stringResource(R.string.filter_suburb)
+        "Level" -> stringResource(R.string.filter_level)
+        "Authority" -> stringResource(R.string.filter_authority)
+        "Gender" -> stringResource(R.string.filter_gender)
+        else -> category
+    }
+}
 
 @Composable
 fun FilterChipView(
@@ -29,9 +43,9 @@ fun FilterChipView(
         items(filterCategories) { category ->
             val isActive = activeFilters.containsKey(category)
             val displayText = if (isActive) {
-                activeFilters[category] ?: category
+                activeFilters[category] ?: getLocalizedCategoryName(category)
             } else {
-                category
+                getLocalizedCategoryName(category)
             }
             
             FilterChipButton(
@@ -44,7 +58,7 @@ fun FilterChipView(
         // International students toggle chip
         item {
             FilterChipButton(
-                category = "International",
+                category = stringResource(R.string.international),
                 isActive = activeInternationalFilter,
                 onTap = onInternationalFilterToggle
             )
@@ -53,7 +67,7 @@ fun FilterChipView(
         // UE/NCEA toggle chip
         item {
             FilterChipButton(
-                category = "UE / NCEA",
+                category = stringResource(R.string.ue_ncea),
                 isActive = activeUEFilter,
                 onTap = onUEFilterToggle
             )

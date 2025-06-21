@@ -7,8 +7,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
 
 @Composable
 fun ErrorState(
@@ -39,7 +41,7 @@ fun ErrorState(
                     modifier = Modifier.size(64.dp)
                 )
                 Text(
-                    text = "Oops! Something went wrong",
+                    text = stringResource(R.string.error_something_wrong),
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     textAlign = TextAlign.Center
@@ -57,7 +59,7 @@ fun ErrorState(
                         contentColor = MaterialTheme.colorScheme.onError
                     )
                 ) {
-                    Text("Try Again")
+                    Text(stringResource(R.string.try_again))
                 }
             }
         }

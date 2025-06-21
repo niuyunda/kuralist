@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,12 +22,14 @@ import com.kuralist.app.core.services.database.SchoolDatabase
 import com.kuralist.app.features.schools.detail.presentation.components.ErrorState
 import com.kuralist.app.features.schools.detail.presentation.components.LoadingState
 import com.kuralist.app.features.schools.detail.presentation.components.SchoolDetailContent
+import com.kuralist.app.core.services.FavoritesManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SchoolDetailScreen(
     schoolId: Int,
     onBack: () -> Unit,
+    bottomPadding: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
     val viewModel = rememberSchoolDetailViewModel()
@@ -53,6 +56,7 @@ fun SchoolDetailScreen(
                 viewModel.clearError()
                 viewModel.loadSchool(schoolId)
             },
+            bottomPadding = bottomPadding,
             modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -66,8 +70,9 @@ private fun rememberSchoolDetailViewModel(): SchoolDetailViewModel {
     return viewModel {
         val database = SchoolDatabase.getDatabase(context)
         val schoolService = SchoolService(database.schoolDao())
+        val favoritesManager = FavoritesManager(context)
         val analyticsService = AnalyticsService(context)
-        SchoolDetailViewModel(schoolService, analyticsService)
+        SchoolDetailViewModel(schoolService, favoritesManager, analyticsService)
     }
 }
 
@@ -102,7 +107,6 @@ private fun SchoolDetailTopBar(
                     isFavorite = isFavorite,
                     onToggle = onToggleFavorite
                 )
-                ShareButton()
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -126,18 +130,6 @@ private fun FavoriteButton(
             MaterialTheme.colorScheme.onErrorContainer 
         else 
             MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun ShareButton(
-    modifier: Modifier = Modifier
-) {
-    RoundedIconButton(
-        icon = Icons.Default.Share,
-        contentDescription = "Share school",
-        onClick = { /* TODO: Implement share */ },
         modifier = modifier
     )
 }
@@ -176,6 +168,7 @@ private fun RoundedIconButton(
 private fun SchoolDetailContent(
     uiState: SchoolDetailUiState,
     onRetry: () -> Unit,
+    bottomPadding: Dp = 0.dp,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -190,6 +183,7 @@ private fun SchoolDetailContent(
             uiState.school != null -> {
                 SchoolDetailContent(
                     school = uiState.school,
+                    bottomPadding = bottomPadding,
                     modifier = Modifier.fillMaxSize()
                 )
             }

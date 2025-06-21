@@ -15,9 +15,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
+
+@Composable
+private fun getLocalizedCategoryName(category: String): String {
+    return when (category) {
+        "City" -> stringResource(R.string.filter_city)
+        "Suburb" -> stringResource(R.string.filter_suburb)
+        "Level" -> stringResource(R.string.filter_level)
+        "Authority" -> stringResource(R.string.filter_authority)
+        "Gender" -> stringResource(R.string.filter_gender)
+        else -> category
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +54,7 @@ fun FilterOptionsSheetView(
     }
     
     val currentSelectedValue = activeFilters[item.category]
+    val localizedCategoryName = getLocalizedCategoryName(item.category)
     
     Column(
         modifier = modifier
@@ -48,7 +63,7 @@ fun FilterOptionsSheetView(
     ) {
         // Title
         Text(
-            text = "Select ${item.category}",
+            text = stringResource(R.string.select_filter, localizedCategoryName),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -58,11 +73,11 @@ fun FilterOptionsSheetView(
         OutlinedTextField(
             value = searchText,
             onValueChange = { searchText = it },
-            placeholder = { Text("Search ${item.category.lowercase()}...") },
+            placeholder = { Text(stringResource(R.string.search_filter, localizedCategoryName.lowercase())) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Search"
+                    contentDescription = stringResource(R.string.search)
                 )
             },
             keyboardOptions = KeyboardOptions(
@@ -108,7 +123,7 @@ fun FilterOptionsSheetView(
                     if (isSelected) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Selected",
+                            contentDescription = stringResource(R.string.selected),
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )

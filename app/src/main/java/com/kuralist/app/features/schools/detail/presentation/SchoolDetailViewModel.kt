@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kuralist.app.core.models.School
 import com.kuralist.app.core.services.AnalyticsService
+import com.kuralist.app.core.services.FavoritesManager
 import com.kuralist.app.core.services.SchoolService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ data class SchoolDetailUiState(
 
 class SchoolDetailViewModel(
     private val schoolService: SchoolService,
+    private val favoritesManager: FavoritesManager,
     private val analyticsService: AnalyticsService
 ) : ViewModel() {
     
@@ -34,9 +36,12 @@ class SchoolDetailViewModel(
             
             try {
                 val schoolData = schoolService.fetchSchoolById(schoolId)
+                val isFavorite = schoolData?.let { favoritesManager.isFavorite(it) } ?: false
+                
                 _uiState.value = _uiState.value.copy(
                     school = schoolData,
-                    isLoading = false
+                    isLoading = false,
+                    isFavorite = isFavorite
                 )
                 
                 // Track school view
@@ -46,9 +51,6 @@ class SchoolDetailViewModel(
                         schoolName = school.schoolName
                     )
                 }
-                
-                // TODO: Check if school is in favorites
-                // _uiState.value = _uiState.value.copy(isFavorite = favoritesManager.isFavorite(schoolData))
                 
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -63,9 +65,10 @@ class SchoolDetailViewModel(
         val currentSchool = _uiState.value.school ?: return
         viewModelScope.launch {
             try {
-                // TODO: Implement favorites toggle
-                // favoritesManager.toggleFavorite(currentSchool)
-                val newFavoriteState = !_uiState.value.isFavorite
+                val wasFavorite = _uiState.value.isFavorite
+                favoritesManager.toggleFavorite(currentSchool)
+                val newFavoriteState = !wasFavorite
+                
                 _uiState.value = _uiState.value.copy(
                     isFavorite = newFavoriteState
                 )

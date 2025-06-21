@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.kuralist.app.core.models.School
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "favorites")
@@ -21,15 +22,7 @@ class FavoritesManager(private val context: Context) {
         }
     
     suspend fun isFavorite(school: School): Boolean {
-        return context.dataStore.data.map { preferences ->
-            val favoriteIds = preferences[favoriteSchoolIdsKey] ?: emptySet()
-            favoriteIds.contains(school.id.toString())
-        }.let { flow ->
-            // Get the first emission from the flow
-            var result = false
-            flow.collect { result = it }
-            result
-        }
+        return favoriteSchoolIds.first().contains(school.id.toString())
     }
     
     suspend fun toggleFavorite(school: School) {

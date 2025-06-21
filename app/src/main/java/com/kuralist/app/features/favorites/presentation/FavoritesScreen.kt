@@ -76,9 +76,9 @@ fun FavoritesScreen(
                             expanded = showDropdownMenu,
                             onDismissRequest = { showDropdownMenu = false }
                         ) {
-                                                    DropdownMenuItem(
-                            text = { Text(stringResource(R.string.clear_all_favorites)) },
-                            onClick = {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.clear_all_favorites)) },
+                                onClick = {
                                     showDropdownMenu = false
                                     showClearConfirmDialog = true
                                 },

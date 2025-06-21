@@ -6,8 +6,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
 import com.kuralist.app.core.models.School
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -76,6 +79,7 @@ enum class SchoolLabelType {
     PERFORMANCE
 }
 
+@Composable
 private fun generateSchoolLabels(school: School): List<SchoolLabelData> {
     return buildList {
         // Priority 1: Gender (if not coeducational)
@@ -145,7 +149,7 @@ private fun generateSchoolLabels(school: School): List<SchoolLabelData> {
         // Priority 4: Special features
         if (school.boardingFacilities == true) {
             add(SchoolLabelData(
-                "Boarding", 
+                stringResource(R.string.boarding), 
                 SchoolLabelType.SPECIAL_FEATURE, 
                 Color(0xFF92400E), 
                 Color.White
@@ -155,7 +159,7 @@ private fun generateSchoolLabels(school: School): List<SchoolLabelData> {
         school.internationalStudents?.let { intl ->
             if (intl > 0) {
                 add(SchoolLabelData(
-                    "International", 
+                    stringResource(R.string.international), 
                     SchoolLabelType.SPECIAL_FEATURE, 
                     Color(0xFF7C2D12), 
                     Color.White

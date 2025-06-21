@@ -11,8 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
 import com.kuralist.app.core.models.School
 
 @Composable
@@ -20,61 +23,56 @@ fun QuickStatsSection(
     school: School,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    Row(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text(
-            text = "Quick Stats",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.SemiBold
-        )
-        
-        val stats = buildList<Triple<String, String, ImageVector?>> {
-            school.totalSchoolRoll?.let { roll ->
-                add(Triple("Students", roll.toString(), Icons.Outlined.Person))
-            }
-            school.schoolType?.let { type ->
-                add(Triple("Type", type, Icons.Outlined.Info))
-            }
-            school.eqiDeciles?.let { decile ->
-                add(Triple("Decile", decile.toString(), Icons.Outlined.Star))
-            }
+        // School Type
+        school.schoolType?.let { type ->
+            StatCard(
+                icon = Icons.Outlined.Info,
+                value = type,
+                label = stringResource(R.string.type),
+                modifier = Modifier.weight(1f)
+            )
         }
         
-        if (stats.isNotEmpty()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                stats.forEach { (label, value, icon) ->
-                    StatCard(
-                        label = label,
-                        value = value,
-                        icon = icon,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
+        // School Roll
+        school.totalSchoolRoll?.let { roll ->
+            StatCard(
+                icon = Icons.Outlined.Person,
+                value = roll.toString(),
+                label = stringResource(R.string.school_roll),
+                modifier = Modifier.weight(1f)
+            )
+        }
+        
+        // EQI (if available)
+        school.eqiDeciles?.let { eqi ->
+            StatCard(
+                icon = Icons.Outlined.Star,
+                value = stringResource(R.string.eqi_format, eqi),
+                label = stringResource(R.string.eqi),
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
 
 @Composable
 private fun StatCard(
-    label: String,
+    icon: ImageVector,
     value: String,
-    icon: ImageVector?,
+    label: String,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -83,26 +81,26 @@ private fun StatCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            icon?.let {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
             
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
             
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
             )
         }
     }

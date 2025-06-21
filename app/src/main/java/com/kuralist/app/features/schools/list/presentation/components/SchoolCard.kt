@@ -2,6 +2,8 @@ package com.kuralist.app.features.schools.list.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -11,9 +13,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
 import com.kuralist.app.core.models.School
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -130,47 +134,42 @@ fun SchoolCard(
             }
             
             // Academic performance indicators
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                school.uePassRate2023AllLeavers?.let { rate ->
-                    if (rate > 0) {
-                        AssistChip(
-                            onClick = { },
-                            label = { 
-                                Text(
-                                    text = "UE: ${String.format("%.1f", rate)}%",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
+            SchoolPerformanceChips(school, modifier = Modifier.fillMaxWidth())
+        }
+    }
+}
+
+@Composable
+private fun SchoolPerformanceChips(
+    school: School,
+    modifier: Modifier = Modifier
+) {
+    val ueText = school.uePassRate2023AllLeavers?.takeIf { it > 0 }?.let { rate ->
+        stringResource(R.string.ue_pass_rate, rate)
+    }
+    val decileText = school.eqiDeciles?.let { decile ->
+        stringResource(R.string.decile_number, decile)
+    }
+    val boardingText = if (school.boardingFacilities == true) stringResource(R.string.boarding) else null
+    
+    val chipTexts = listOfNotNull(ueText, decileText, boardingText)
+    
+    if (chipTexts.isNotEmpty()) {
+        LazyRow(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(chipTexts) { chipText ->
+                AssistChip(
+                    onClick = { },
+                    label = { 
+                        Text(
+                            text = chipText,
+                            style = MaterialTheme.typography.labelSmall
                         )
                     }
-                }
-                
-                school.eqiDeciles?.let { decile ->
-                    AssistChip(
-                        onClick = { },
-                        label = { 
-                            Text(
-                                text = "Decile $decile",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    )
-                }
-                
-                if (school.boardingFacilities == true) {
-                    AssistChip(
-                        onClick = { },
-                        label = { 
-                            Text(
-                                text = "Boarding",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    )
-                }
+                )
             }
         }
     }

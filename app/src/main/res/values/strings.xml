@@ -13,6 +13,8 @@
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     
     <!-- Authentication -->
     <string name="login">Login</string>
@@ -30,12 +32,19 @@
     <string name="demographics">Demographics</string>
     <string name="contact_info">Contact Information</string>
     <string name="address">Address</string>
+    <string name="location">Location</string>
     <string name="boarding_facilities">Boarding Facilities</string>
     <string name="school_details">School Details</string>
     <string name="total_students">Total Students</string>
     <string name="school_type">School Type</string>
+    <string name="school_roll">School Roll</string>
     <string name="authority">Authority</string>
     <string name="decile">Decile</string>
+    <string name="eqi">EQI</string>
+    <string name="eqi_format">%d/10</string>
+    <string name="donations">Donations</string>
+    <string name="status">Status</string>
+    <string name="get_directions">Get Directions</string>
     
     <!-- Filters -->
     <string name="filter_by_city">Filter by City</string>
@@ -44,6 +53,13 @@
     <string name="filter_by_authority">Filter by Authority</string>
     <string name="clear_filters">Clear Filters</string>
     <string name="apply_filters">Apply Filters</string>
+    
+    <!-- Filter Categories -->
+    <string name="filter_city">City</string>
+    <string name="filter_suburb">Suburb</string>
+    <string name="filter_level">Level</string>
+    <string name="filter_authority">Authority</string>
+    <string name="filter_gender">Gender</string>
     
     <!-- Errors -->
     <string name="error_loading_schools">Failed to load schools</string>
@@ -84,6 +100,7 @@
     <string name="dismiss">Dismiss</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear search</string>
+    <string name="selected">Selected</string>
     <string name="data_attribution">DATA ATTRIBUTION</string>
     <string name="school_data_source">School Data Source</string>
     <string name="data_source_description">School information is sourced from Education Counts, Ministry of Education, New Zealand.</string>
@@ -102,4 +119,76 @@
     <string name="language_chinese">中文 (Chinese)</string>
     <string name="select_language">Select Language</string>
     <string name="language_changed">Language changed. Please restart the app to see changes.</string>
+    
+    <!-- Additional missing strings -->
+    <string name="search_schools_placeholder">Search schools...</string>
+    <string name="school_singular">school</string>
+    <string name="schools_plural">schools</string>
+    <string name="found">found</string>
+    <string name="international">International</string>
+    <string name="ue_ncea">UE / NCEA</string>
+    <string name="students">Students</string>
+    <string name="type">Type</string>
+    <string name="available">Available</string>
+    <string name="not_available">Not Available</string>
+    <string name="general_information">General Information</string>
+    <string name="gender_composition">Gender Composition</string>
+    <string name="gender_of_students">Gender of Students</string>
+    <string name="language_of_instruction">Language of Instruction</string>
+    <string name="enrolment_scheme">Enrolment Scheme</string>
+    <string name="cohort_entry">Cohort Entry</string>
+    <string name="isolation_index">Isolation Index</string>
+    <string name="urban_rural">Urban/Rural</string>
+    <string name="phone">Phone</string>
+    <string name="website">Website</string>
+    <string name="principal">Principal</string>
+    <string name="percentage_count_format" formatted="false">%d%% (%d)</string>
+    
+    <!-- Administrative Information -->
+    <string name="admin_region">Admin &amp; Region</string>
+    <string name="takiwa">Takiwā</string>
+    <string name="general_electorate">General Electorate</string>
+    <string name="maori_electorate">Māori Electorate</string>
+    <string name="neighbourhood_sa2">Neighbourhood SA2</string>
+    <string name="ward">Ward</string>
+    <string name="local_office">Local Office</string>
+    
+    <!-- Authentication error messages and labels -->
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="email_verification_sent">Please check your email to verify your account</string>
+    <string name="sign_up_failed">Sign up failed: %s</string>
+    <string name="sign_in_failed">Sign in failed: %s</string>
+    <string name="sign_out_failed">Sign out failed: %s</string>
+    <string name="enter_email_address">Please enter your email address</string>
+    <string name="password_reset_sent">Password reset email sent</string>
+    <string name="password_reset_failed">Failed to send reset email: %s</string>
+    <string name="email_required">Email is required</string>
+    <string name="email_invalid">Please enter a valid email address</string>
+    <string name="password_required">Password is required</string>
+    <string name="password_too_short">Password must be at least 6 characters long</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    
+    <!-- School Detail Sections -->
+    <string name="address_location">Address &amp; Location</string>
+    <string name="administrative_information">Administrative Information</string>
+    <string name="ue_pass_rate_all_leavers">UE Pass Rate (All Leavers)</string>
+    <string name="ncea_pass_rate_all_leavers">NCEA Pass Rate (All Leavers)</string>
+    <string name="ue_pass_rate_year_13">UE Pass Rate (Year 13)</string>
+    <string name="ncea_pass_rate_year_13">NCEA Pass Rate (Year 13)</string>
+    <string name="street">Street</string>
+    <string name="suburb">Suburb</string>
+    <string name="city">City</string>
+    <string name="postal_code">Postal Code</string>
+    <string name="area_type">Area Type</string>
+    <string name="education_region">Education Region</string>
+    <string name="territorial_authority">Territorial Authority</string>
+    <string name="regional_council">Regional Council</string>
+    <string name="community_of_learning">Community of Learning</string>
+    <string name="european_pakeha">European/Pākehā</string>
+    <string name="maori">Māori</string>
+    <string name="pacific">Pacific</string>
+    <string name="asian">Asian</string>
+    <string name="melaa">MELAA</string>
+    <string name="other">Other</string>
 </resources>

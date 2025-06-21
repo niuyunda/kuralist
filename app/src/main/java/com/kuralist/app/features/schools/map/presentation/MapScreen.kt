@@ -131,7 +131,7 @@ fun MapScreen(
         ) {
             UnifiedSearchAndFilterBar(
                 filterState = filterState,
-                searchPlaceholder = "Search schools on map...",
+                // searchPlaceholder = "Search schools on map...",
                 isElevated = true,
                 modifier = Modifier.fillMaxWidth()
             )

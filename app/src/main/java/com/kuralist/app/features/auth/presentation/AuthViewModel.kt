@@ -14,6 +14,22 @@ import kotlinx.coroutines.launch
 // import javax.inject.Inject
 // import dagger.hilt.android.lifecycle.HiltViewModel
 
+// Error codes for localization
+sealed class AuthError {
+    object EmailRequired : AuthError()
+    object EmailInvalid : AuthError()
+    object PasswordRequired : AuthError()
+    object PasswordTooShort : AuthError()
+    object PasswordsDoNotMatch : AuthError()
+    object EnterEmailAddress : AuthError()
+    object EmailVerificationSent : AuthError()
+    object PasswordResetSent : AuthError()
+    data class SignUpFailed(val message: String) : AuthError()
+    data class SignInFailed(val message: String) : AuthError()
+    data class SignOutFailed(val message: String) : AuthError()
+    data class PasswordResetFailed(val message: String) : AuthError()
+}
+
 class AuthViewModel constructor() : ViewModel() {
     
     companion object {
@@ -35,8 +51,8 @@ class AuthViewModel constructor() : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+    private val _authError = MutableStateFlow<AuthError?>(null)
+    val authError: StateFlow<AuthError?> = _authError.asStateFlow()
 
     private val _isSignUpMode = MutableStateFlow(false)
     val isSignUpMode: StateFlow<Boolean> = _isSignUpMode.asStateFlow()
@@ -81,7 +97,7 @@ class AuthViewModel constructor() : ViewModel() {
         
         viewModelScope.launch {
             _isLoading.value = true
-            _errorMessage.value = null
+            _authError.value = null
             
             Log.d(TAG, "Attempting sign up for email: ${_email.value}")
             
@@ -92,10 +108,10 @@ class AuthViewModel constructor() : ViewModel() {
                 }
                 Log.d(TAG, "Sign up successful")
                 // Successful sign up - user needs to verify email
-                _errorMessage.value = "Please check your email to verify your account"
+                _authError.value = AuthError.EmailVerificationSent
             } catch (e: Exception) {
                 Log.e(TAG, "Sign up failed", e)
-                _errorMessage.value = "Sign up failed: ${e.message}"
+                _authError.value = AuthError.SignUpFailed(e.message ?: "Unknown error")
             } finally {
                 _isLoading.value = false
             }
@@ -107,7 +123,7 @@ class AuthViewModel constructor() : ViewModel() {
         
         viewModelScope.launch {
             _isLoading.value = true
-            _errorMessage.value = null
+            _authError.value = null
             
             Log.d(TAG, "Attempting sign in for email: ${_email.value}")
             
@@ -119,7 +135,7 @@ class AuthViewModel constructor() : ViewModel() {
                 Log.d(TAG, "Sign in successful")
             } catch (e: Exception) {
                 Log.e(TAG, "Sign in failed", e)
-                _errorMessage.value = "Sign in failed: ${e.message}"
+                _authError.value = AuthError.SignInFailed(e.message ?: "Unknown error")
             } finally {
                 _isLoading.value = false
             }
@@ -134,30 +150,30 @@ class AuthViewModel constructor() : ViewModel() {
                 Log.d(TAG, "Sign out successful")
             } catch (e: Exception) {
                 Log.e(TAG, "Sign out failed", e)
-                _errorMessage.value = "Sign out failed: ${e.message}"
+                _authError.value = AuthError.SignOutFailed(e.message ?: "Unknown error")
             }
         }
     }
 
     fun resetPassword() {
         if (_email.value.isBlank()) {
-            _errorMessage.value = "Please enter your email address"
+            _authError.value = AuthError.EnterEmailAddress
             return
         }
         
         viewModelScope.launch {
             _isLoading.value = true
-            _errorMessage.value = null
+            _authError.value = null
             
             Log.d(TAG, "Attempting password reset for email: ${_email.value}")
             
             try {
                 SupabaseManager.client.auth.resetPasswordForEmail(_email.value)
                 Log.d(TAG, "Password reset email sent")
-                _errorMessage.value = "Password reset email sent"
+                _authError.value = AuthError.PasswordResetSent
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to send reset email", e)
-                _errorMessage.value = "Failed to send reset email: ${e.message}"
+                _authError.value = AuthError.PasswordResetFailed(e.message ?: "Unknown error")
             } finally {
                 _isLoading.value = false
             }
@@ -177,15 +193,15 @@ class AuthViewModel constructor() : ViewModel() {
     private fun validateSignInForm(): Boolean {
         when {
             _email.value.isBlank() -> {
-                _errorMessage.value = "Email is required"
+                _authError.value = AuthError.EmailRequired
                 return false
             }
             !android.util.Patterns.EMAIL_ADDRESS.matcher(_email.value).matches() -> {
-                _errorMessage.value = "Please enter a valid email address"
+                _authError.value = AuthError.EmailInvalid
                 return false
             }
             _password.value.isBlank() -> {
-                _errorMessage.value = "Password is required"
+                _authError.value = AuthError.PasswordRequired
                 return false
             }
         }
@@ -195,23 +211,23 @@ class AuthViewModel constructor() : ViewModel() {
     private fun validateSignUpForm(): Boolean {
         when {
             _email.value.isBlank() -> {
-                _errorMessage.value = "Email is required"
+                _authError.value = AuthError.EmailRequired
                 return false
             }
             !android.util.Patterns.EMAIL_ADDRESS.matcher(_email.value).matches() -> {
-                _errorMessage.value = "Please enter a valid email address"
+                _authError.value = AuthError.EmailInvalid
                 return false
             }
             _password.value.isBlank() -> {
-                _errorMessage.value = "Password is required"
+                _authError.value = AuthError.PasswordRequired
                 return false
             }
             _password.value.length < 6 -> {
-                _errorMessage.value = "Password must be at least 6 characters long"
+                _authError.value = AuthError.PasswordTooShort
                 return false
             }
             _password.value != _confirmPassword.value -> {
-                _errorMessage.value = "Passwords do not match"
+                _authError.value = AuthError.PasswordsDoNotMatch
                 return false
             }
         }
@@ -219,7 +235,7 @@ class AuthViewModel constructor() : ViewModel() {
     }
 
     private fun clearError() {
-        _errorMessage.value = null
+        _authError.value = null
     }
 
     private fun clearForm() {

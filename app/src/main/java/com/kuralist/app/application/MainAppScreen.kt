@@ -11,8 +11,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kuralist.app.R
 import com.kuralist.app.features.auth.presentation.AuthViewModel
 import com.kuralist.app.features.favorites.presentation.FavoritesScreen
 import com.kuralist.app.features.profile.presentation.ProfileScreen
@@ -25,7 +27,7 @@ import com.kuralist.app.core.services.database.SchoolDatabase
 import kotlinx.coroutines.launch
 
 data class BottomNavItem(
-    val label: String,
+    val labelRes: Int,
     val icon: ImageVector,
     val route: String
 )
@@ -54,16 +56,17 @@ fun MainAppScreen(
     val favoriteSchoolIds by favoritesManager.favoriteSchoolIds.collectAsStateWithLifecycle(emptySet())
     
     val bottomNavItems = listOf(
-        BottomNavItem("Schools", Icons.Default.Home, "schools"),
-        BottomNavItem("Map", Icons.Default.LocationOn, "map"),
-        BottomNavItem("Favorites", Icons.Default.Favorite, "favorites"),
-        BottomNavItem("Profile", Icons.Default.Person, "profile")
+        BottomNavItem(R.string.schools, Icons.Default.Home, "schools"),
+        BottomNavItem(R.string.map, Icons.Default.LocationOn, "map"),
+        BottomNavItem(R.string.favorites, Icons.Default.Favorite, "favorites"),
+        BottomNavItem(R.string.profile, Icons.Default.Person, "profile")
     )
 
     Scaffold(
         bottomBar = {
             NavigationBar {
                 bottomNavItems.forEachIndexed { index, item ->
+                    val label = stringResource(item.labelRes)
                     NavigationBarItem(
                         selected = selectedTabIndex == index,
                         onClick = { 
@@ -73,10 +76,10 @@ fun MainAppScreen(
                         icon = { 
                             Icon(
                                 imageVector = item.icon, 
-                                contentDescription = item.label
+                                contentDescription = label
                             ) 
                         },
-                        label = { Text(item.label) }
+                        label = { Text(label) }
                     )
                 }
             }
@@ -87,9 +90,8 @@ fun MainAppScreen(
             com.kuralist.app.features.schools.detail.presentation.SchoolDetailScreen(
                 schoolId = selectedSchoolId!!,
                 onBack = { selectedSchoolId = null },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+                bottomPadding = paddingValues.calculateBottomPadding(),
+                modifier = Modifier.fillMaxSize()
             )
         } else {
             when (selectedTabIndex) {

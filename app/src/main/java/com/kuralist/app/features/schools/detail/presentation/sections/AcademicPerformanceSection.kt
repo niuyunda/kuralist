@@ -5,7 +5,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.kuralist.app.R
 import com.kuralist.app.core.models.School
 import com.kuralist.app.features.schools.detail.presentation.components.InfoRow
 import com.kuralist.app.features.schools.detail.presentation.components.SectionCard
@@ -16,7 +18,7 @@ fun AcademicPerformanceSection(
     modifier: Modifier = Modifier
 ) {
     SectionCard(
-        title = "Academic Performance",
+        title = stringResource(R.string.academic_performance),
         icon = Icons.Default.Star,
         modifier = modifier
     ) {
@@ -24,16 +26,16 @@ fun AcademicPerformanceSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             school.uePassRate2023AllLeavers?.let { rate ->
-                InfoRow("UE Pass Rate (All Leavers)", "${rate.toInt()}%")
+                InfoRow(stringResource(R.string.ue_pass_rate_all_leavers), "${rate.toInt()}%")
             }
             school.nceaPassRate2023AllLeavers?.let { rate ->
-                InfoRow("NCEA Pass Rate (All Leavers)", "${rate.toInt()}%")
+                InfoRow(stringResource(R.string.ncea_pass_rate_all_leavers), "${rate.toInt()}%")
             }
             school.uePassRate2023Year13?.let { rate ->
-                InfoRow("UE Pass Rate (Year 13)", "${rate.toInt()}%")
+                InfoRow(stringResource(R.string.ue_pass_rate_year_13), "${rate.toInt()}%")
             }
             school.nceaPassRate2023Year13?.let { rate ->
-                InfoRow("NCEA Pass Rate (Year 13)", "${rate.toInt()}%")
+                InfoRow(stringResource(R.string.ncea_pass_rate_year_13), "${rate.toInt()}%")
             }
         }
     }

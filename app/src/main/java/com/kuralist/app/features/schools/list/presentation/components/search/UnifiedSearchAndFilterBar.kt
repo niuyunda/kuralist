@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kuralist.app.R
 import com.kuralist.app.shared.ui.components.filter.SchoolFilterBar
 import com.kuralist.app.shared.ui.components.filter.SchoolFilterState
 
@@ -20,10 +22,11 @@ import com.kuralist.app.shared.ui.components.filter.SchoolFilterState
 fun UnifiedSearchAndFilterBar(
     filterState: SchoolFilterState,
     modifier: Modifier = Modifier,
-    searchPlaceholder: String = "Search schools...",
+    searchPlaceholder: String? = null,
     isElevated: Boolean = false // For map overlay styling
 ) {
     val filterSearchText by filterState.searchText.collectAsStateWithLifecycle()
+    val placeholder = searchPlaceholder ?: stringResource(R.string.search_schools_placeholder)
     
     Column(
         modifier = modifier.fillMaxWidth()
@@ -37,7 +40,7 @@ fun UnifiedSearchAndFilterBar(
                 SearchTextField(
                     value = filterSearchText,
                     onValueChange = { filterState.updateSearchText(it) },
-                    placeholder = searchPlaceholder,
+                    placeholder = placeholder,
                     onClear = { filterState.updateSearchText("") },
                     isElevated = true
                 )
@@ -46,7 +49,7 @@ fun UnifiedSearchAndFilterBar(
             SearchTextField(
                 value = filterSearchText,
                 onValueChange = { filterState.updateSearchText(it) },
-                placeholder = searchPlaceholder,
+                placeholder = placeholder,
                 onClear = { filterState.updateSearchText("") },
                 isElevated = false
             )
@@ -99,7 +102,7 @@ private fun SearchTextField(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search"
+                contentDescription = stringResource(R.string.search)
             )
         },
         trailingIcon = {
@@ -107,7 +110,7 @@ private fun SearchTextField(
                 IconButton(onClick = onClear) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear search"
+                        contentDescription = stringResource(R.string.clear_search)
                     )
                 }
             }

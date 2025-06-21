@@ -3,7 +3,6 @@ package com.kuralist.app.features.schools.detail.presentation.sections
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -11,6 +10,8 @@ import androidx.compose.ui.unit.dp
 import com.kuralist.app.core.models.School
 import com.kuralist.app.features.schools.detail.presentation.components.InfoRow
 import com.kuralist.app.features.schools.detail.presentation.components.SectionCard
+import androidx.compose.ui.res.stringResource
+import com.kuralist.app.R
 
 @Composable
 fun DemographicsSection(
@@ -18,39 +19,42 @@ fun DemographicsSection(
     modifier: Modifier = Modifier
 ) {
     SectionCard(
-        title = "Demographics",
+        title = stringResource(R.string.demographics),
         icon = Icons.Default.Person,
         modifier = modifier
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             school.totalSchoolRoll?.let { total ->
-                InfoRow("Total Students", total.toString())
-                
-                // Ethnicity breakdown
-                val ethnicityData = listOfNotNull(
-                    school.europeanPakehaStudents?.let { "European/Pākehā" to it },
-                    school.maoriStudents?.let { "Māori" to it },
-                    school.pacificStudents?.let { "Pacific" to it },
-                    school.asianStudents?.let { "Asian" to it },
-                    school.melaaStudents?.let { "MELAA" to it },
-                    school.otherStudents?.let { "Other" to it },
-                    school.internationalStudents?.let { "International" to it }
-                )
-                
-                if (ethnicityData.isNotEmpty()) {
-                    Text(
-                        text = "Ethnicity Breakdown",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                    
-                    ethnicityData.forEach { (ethnicity, count) ->
-                        val percentage = (count.toDouble() / total * 100).toInt()
-                        InfoRow(ethnicity, "$count ($percentage%)")
-                    }
+                // Ethnicity breakdown - matching iOS order and format
+                school.europeanPakehaStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.european_pakeha), stringResource(R.string.percentage_count_format, percentage, count))
+                }
+                school.maoriStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.maori), stringResource(R.string.percentage_count_format, percentage, count))
+                }
+                school.pacificStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.pacific), stringResource(R.string.percentage_count_format, percentage, count))
+                }
+                school.asianStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.asian), stringResource(R.string.percentage_count_format, percentage, count))
+                }
+                school.melaaStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.melaa), stringResource(R.string.percentage_count_format, percentage, count))
+                }
+                school.otherStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.other), stringResource(R.string.percentage_count_format, percentage, count))
+                }
+                school.internationalStudents?.let { count ->
+                    val percentage = (count.toDouble() / total * 100).toInt()
+                    InfoRow(stringResource(R.string.international), stringResource(R.string.percentage_count_format, percentage, count))
                 }
             }
         }
