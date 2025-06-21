@@ -57,12 +57,13 @@ fun FilterChipButton(
             },
         color = containerColor,
         shape = RoundedCornerShape(25.dp),
+        shadowElevation = if (isActive) 2.dp else 0.dp,
         tonalElevation = if (isActive) 4.dp else 0.dp
     ) {
         Text(
             text = category,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (isActive) FontWeight.Medium else FontWeight.Normal,
+            fontWeight = if (isActive) FontWeight.SemiBold else FontWeight.Medium,
             color = contentColor,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
         )

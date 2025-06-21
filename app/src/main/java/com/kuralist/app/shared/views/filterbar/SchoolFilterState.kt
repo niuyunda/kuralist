@@ -143,11 +143,11 @@ class SchoolFilterState : ViewModel() {
             }
         }
         
-        // Apply UE/NCEA filter (>70% pass rate)
+        // Apply UE/NCEA filter (>70% pass rate, stored as decimal 0.7)
         if (ueFilter) {
             result = result.filter { school ->
-                (school.uePassRate2023Year13 ?: 0.0) > 70.0 || 
-                (school.nceaPassRate2023Year13 ?: 0.0) > 70.0
+                (school.uePassRate2023Year13 ?: 0.0) > 0.7 || 
+                (school.nceaPassRate2023Year13 ?: 0.0) > 0.7
             }
         }
         
