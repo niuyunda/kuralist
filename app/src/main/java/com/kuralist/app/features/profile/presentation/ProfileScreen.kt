@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 // import androidx.hilt.navigation.compose.hiltViewModel
-import com.kuralist.app.features.authentication.AuthViewModel
+import com.kuralist.app.features.auth.presentation.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

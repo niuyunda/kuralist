@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kuralist.app.core.models.School
-import com.kuralist.app.features.schooldetail.components.InfoRow
-import com.kuralist.app.features.schooldetail.components.SectionCard
+import com.kuralist.app.features.schools.detail.presentation.components.InfoRow
+import com.kuralist.app.features.schools.detail.presentation.components.SectionCard
 
 @Composable
 fun AdministrativeInformationSection(

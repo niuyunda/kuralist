@@ -27,9 +27,9 @@ import com.google.maps.android.compose.*
 import com.kuralist.app.core.models.School
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.database.SchoolDatabase
-import com.kuralist.app.shared.components.PermissionHandler
-import com.kuralist.app.shared.views.UnifiedSearchAndFilterBar
-import com.kuralist.app.shared.views.filterbar.SchoolFilterState
+import com.kuralist.app.shared.ui.components.PermissionHandler
+import com.kuralist.app.features.schools.list.presentation.components.search.UnifiedSearchAndFilterBar
+import com.kuralist.app.shared.ui.components.filter.SchoolFilterState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -44,7 +44,7 @@ private val NEW_ZEALAND_BOUNDS = LatLngBounds(
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    sharedFilterState: com.kuralist.app.shared.views.filterbar.SchoolFilterState? = null,
+    sharedFilterState: SchoolFilterState? = null,
     onSchoolClick: ((Int) -> Unit)? = null
 ) {
     val context = LocalContext.current

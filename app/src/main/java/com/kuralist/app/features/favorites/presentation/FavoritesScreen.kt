@@ -21,7 +21,7 @@ import com.kuralist.app.core.models.School
 import com.kuralist.app.core.services.FavoritesManager
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.database.SchoolDatabase
-import com.kuralist.app.shared.views.SchoolCard
+import com.kuralist.app.features.schools.list.presentation.components.SchoolCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

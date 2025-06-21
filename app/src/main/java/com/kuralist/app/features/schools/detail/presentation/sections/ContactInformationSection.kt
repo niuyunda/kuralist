@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kuralist.app.core.models.School
-import com.kuralist.app.features.schooldetail.components.ContactItem
-import com.kuralist.app.features.schooldetail.components.ContactItemRow
-import com.kuralist.app.features.schooldetail.components.SectionCard
+import com.kuralist.app.features.schools.detail.presentation.components.ContactItem
+import com.kuralist.app.features.schools.detail.presentation.components.ContactItemRow
+import com.kuralist.app.features.schools.detail.presentation.components.SectionCard
 
 @Composable
 fun ContactInformationSection(

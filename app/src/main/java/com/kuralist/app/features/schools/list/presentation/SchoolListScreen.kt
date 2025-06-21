@@ -11,9 +11,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.kuralist.app.shared.views.SchoolListItem
-import com.kuralist.app.shared.views.UnifiedSearchAndFilterBar
-import com.kuralist.app.shared.views.filterbar.SchoolFilterState
+import com.kuralist.app.features.schools.list.presentation.components.SchoolListItem
+import com.kuralist.app.features.schools.list.presentation.components.search.UnifiedSearchAndFilterBar
+import com.kuralist.app.shared.ui.components.filter.SchoolFilterState
 import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)

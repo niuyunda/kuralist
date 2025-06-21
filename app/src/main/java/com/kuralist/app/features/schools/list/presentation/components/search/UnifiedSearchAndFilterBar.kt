@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kuralist.app.shared.views.filterbar.SchoolFilterBar
-import com.kuralist.app.shared.views.filterbar.SchoolFilterState
+import com.kuralist.app.shared.ui.components.filter.SchoolFilterBar
+import com.kuralist.app.shared.ui.components.filter.SchoolFilterState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
