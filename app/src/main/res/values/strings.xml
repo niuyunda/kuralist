@@ -51,4 +51,55 @@
     <string name="error_authentication">Authentication failed</string>
     <string name="no_schools_found">No schools found</string>
     <string name="try_adjusting_search">Try adjusting your search or filters</string>
+    
+    <!-- Additional strings for hardcoded text -->
+    <string name="app_subtitle">New Zealand School Information</string>
+    <string name="loading_schools">Loading schools...</string>
+    <string name="loading_school_details">Loading school details...</string>
+    <string name="loading_favorites">Loading favorites...</string>
+    <string name="refreshing">Refreshing...</string>
+    <string name="school_count_single">%d school found</string>
+    <string name="school_count_plural">%d schools found</string>
+    <string name="students_count">%d students</string>
+    <string name="ue_pass_rate">UE: %.1f%%</string>
+    <string name="decile_number">Decile %d</string>
+    <string name="boarding">Boarding</string>
+    <string name="select_filter">Select %s</string>
+    <string name="search_filter">Search %s...</string>
+    <string name="schools_with_locations">%d schools with locations</string>
+    <string name="kuralist">Kuralist</string>
+    <string name="error_something_wrong">Oops! Something went wrong</string>
+    <string name="try_again">Try Again</string>
+    <string name="no_favorite_schools">No Favorite Schools</string>
+    <string name="add_favorites_instruction">Start adding schools to your favorites by tapping the heart icon on any school</string>
+    <string name="clear_all_favorites">Clear All Favorites</string>
+    <string name="clear_all_favorites_confirmation">Are you sure you want to remove all schools from your favorites? This action cannot be undone.</string>
+    <string name="clear_all">Clear All</string>
+    <string name="ethnicity_breakdown">Ethnicity Breakdown</string>
+    <string name="no_contact_info">No contact information available</string>
+    <string name="quick_stats">Quick Stats</string>
+    <string name="open_in_maps">Open in Maps</string>
+    <string name="view_details">View Details</string>
+    <string name="refresh">Refresh</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="search">Search</string>
+    <string name="clear_search">Clear search</string>
+    <string name="data_attribution">DATA ATTRIBUTION</string>
+    <string name="school_data_source">School Data Source</string>
+    <string name="data_source_description">School information is sourced from Education Counts, Ministry of Education, New Zealand.</string>
+    <string name="data_license">Licensed under Creative Commons Attribution 4.0 International licence.</string>
+    <string name="visit_education_counts">Visit Education Counts</string>
+    <string name="account">ACCOUNT</string>
+    <string name="no_schools_matching_search">No schools found matching \"%s\"</string>
+    <string name="no_schools_available">No schools available</string>
+    <string name="adjust_search_terms">Try adjusting your search terms or filters</string>
+    <string name="pull_to_refresh">Pull down to refresh or check your connection</string>
+    <string name="search_placeholder">Search...</string>
+    
+    <!-- Language settings -->
+    <string name="language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_chinese">中文 (Chinese)</string>
+    <string name="select_language">Select Language</string>
+    <string name="language_changed">Language changed. Please restart the app to see changes.</string>
 </resources>

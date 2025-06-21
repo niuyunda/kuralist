@@ -3,6 +3,7 @@ package com.kuralist.app.features.schools.detail.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kuralist.app.core.models.School
+import com.kuralist.app.core.services.AnalyticsService
 import com.kuralist.app.core.services.SchoolService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +18,8 @@ data class SchoolDetailUiState(
 )
 
 class SchoolDetailViewModel(
-    private val schoolService: SchoolService
+    private val schoolService: SchoolService,
+    private val analyticsService: AnalyticsService
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(SchoolDetailUiState())
@@ -37,6 +39,14 @@ class SchoolDetailViewModel(
                     isLoading = false
                 )
                 
+                // Track school view
+                schoolData?.let { school ->
+                    analyticsService.trackSchoolViewed(
+                        schoolId = school.id,
+                        schoolName = school.schoolName
+                    )
+                }
+                
                 // TODO: Check if school is in favorites
                 // _uiState.value = _uiState.value.copy(isFavorite = favoritesManager.isFavorite(schoolData))
                 
@@ -55,8 +65,16 @@ class SchoolDetailViewModel(
             try {
                 // TODO: Implement favorites toggle
                 // favoritesManager.toggleFavorite(currentSchool)
+                val newFavoriteState = !_uiState.value.isFavorite
                 _uiState.value = _uiState.value.copy(
-                    isFavorite = !_uiState.value.isFavorite
+                    isFavorite = newFavoriteState
+                )
+                
+                // Track favorite action
+                analyticsService.trackSchoolFavorited(
+                    schoolId = currentSchool.id,
+                    schoolName = currentSchool.schoolName,
+                    isFavorited = newFavoriteState
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(

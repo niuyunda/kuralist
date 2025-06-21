@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kuralist.app.core.models.School
+import com.kuralist.app.core.services.AnalyticsService
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.database.SchoolDatabase
 import com.kuralist.app.features.schools.detail.presentation.components.ErrorState
@@ -65,7 +66,8 @@ private fun rememberSchoolDetailViewModel(): SchoolDetailViewModel {
     return viewModel {
         val database = SchoolDatabase.getDatabase(context)
         val schoolService = SchoolService(database.schoolDao())
-        SchoolDetailViewModel(schoolService)
+        val analyticsService = AnalyticsService(context)
+        SchoolDetailViewModel(schoolService, analyticsService)
     }
 }
 

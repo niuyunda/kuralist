@@ -3,6 +3,7 @@ package com.kuralist.app.features.favorites.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kuralist.app.core.models.School
+import com.kuralist.app.core.services.AnalyticsService
 import com.kuralist.app.core.services.FavoritesManager
 import com.kuralist.app.core.services.SchoolService
 import kotlinx.coroutines.flow.*
@@ -10,7 +11,8 @@ import kotlinx.coroutines.launch
 
 class FavoritesViewModel(
     private val favoritesManager: FavoritesManager,
-    private val schoolService: SchoolService
+    private val schoolService: SchoolService,
+    private val analyticsService: AnalyticsService
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -61,7 +63,15 @@ class FavoritesViewModel(
     fun toggleFavorite(school: School) {
         viewModelScope.launch {
             try {
+                val wasFavorite = isFavorite(school)
                 favoritesManager.toggleFavorite(school)
+                
+                // Track analytics
+                analyticsService.trackSchoolFavorited(
+                    schoolId = school.id,
+                    schoolName = school.schoolName,
+                    isFavorited = !wasFavorite
+                )
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to update favorites: ${e.message}"
             }
@@ -72,6 +82,13 @@ class FavoritesViewModel(
         viewModelScope.launch {
             try {
                 favoritesManager.removeFromFavorites(school)
+                
+                // Track analytics
+                analyticsService.trackSchoolFavorited(
+                    schoolId = school.id,
+                    schoolName = school.schoolName,
+                    isFavorited = false
+                )
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to remove from favorites: ${e.message}"
             }
@@ -81,7 +98,11 @@ class FavoritesViewModel(
     fun clearAllFavorites() {
         viewModelScope.launch {
             try {
+                val currentFavoritesCount = favoriteSchools.value.size
                 favoritesManager.clearAllFavorites()
+                
+                // Track analytics
+                analyticsService.trackFavoritesCleared(currentFavoritesCount)
             } catch (e: Exception) {
                 _errorMessage.value = "Failed to clear favorites: ${e.message}"
             }

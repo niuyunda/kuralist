@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
@@ -15,13 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kuralist.app.R
 import com.kuralist.app.core.models.School
+import com.kuralist.app.core.services.AnalyticsService
 import com.kuralist.app.core.services.FavoritesManager
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.database.SchoolDatabase
-import com.kuralist.app.features.schools.list.presentation.components.SchoolCard
+import com.kuralist.app.features.schools.list.presentation.components.SchoolListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,7 +36,8 @@ fun FavoritesScreen(
         val schoolDao = remember { database.schoolDao() }
         val schoolService = remember { SchoolService(schoolDao) }
         val favoritesManager = remember { FavoritesManager(context) }
-        viewModel { FavoritesViewModel(favoritesManager, schoolService) }
+        val analyticsService = remember { AnalyticsService(context) }
+        viewModel { FavoritesViewModel(favoritesManager, schoolService, analyticsService) }
     }
 ) {
     val favoriteSchools by viewModel.favoriteSchools.collectAsStateWithLifecycle()
@@ -44,13 +47,20 @@ fun FavoritesScreen(
     var showClearConfirmDialog by remember { mutableStateOf(false) }
     var showDropdownMenu by remember { mutableStateOf(false) }
 
+    // Track screen view
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        val analyticsService = AnalyticsService(context)
+        analyticsService.trackScreenView("Favorites")
+    }
+
     Column(
         modifier = modifier.fillMaxSize()
     ) {
         // Top App Bar with actions
         TopAppBar(
             title = { 
-                Text("Favorites") 
+                Text(stringResource(R.string.favorites)) 
             },
             actions = {
                 if (favoriteSchools.isNotEmpty()) {
@@ -66,9 +76,9 @@ fun FavoritesScreen(
                             expanded = showDropdownMenu,
                             onDismissRequest = { showDropdownMenu = false }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Clear all favorites") },
-                                onClick = {
+                                                    DropdownMenuItem(
+                            text = { Text(stringResource(R.string.clear_all_favorites)) },
+                            onClick = {
                                     showDropdownMenu = false
                                     showClearConfirmDialog = true
                                 },
@@ -87,13 +97,12 @@ fun FavoritesScreen(
 
         // Error message
         errorMessage?.let { error ->
-            Card(
+            Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                color = MaterialTheme.colorScheme.errorContainer,
+                shape = MaterialTheme.shapes.small
             ) {
                 Row(
                     modifier = Modifier
@@ -105,12 +114,13 @@ fun FavoritesScreen(
                     Text(
                         text = error,
                         color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
                     TextButton(
                         onClick = { viewModel.clearError() }
                     ) {
-                        Text("Dismiss")
+                        Text(stringResource(R.string.dismiss))
                     }
                 }
             }
@@ -123,7 +133,17 @@ fun FavoritesScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.loading_favorites),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
             
@@ -133,87 +153,67 @@ fun FavoritesScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Card(
-                        modifier = Modifier.padding(24.dp)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(32.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.FavoriteBorder,
-                                contentDescription = null,
-                                modifier = Modifier.size(64.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            
-                            Spacer(modifier = Modifier.height(16.dp))
-                            
-                            Text(
-                                text = "No Favorite Schools",
-                                style = MaterialTheme.typography.titleLarge,
-                                textAlign = TextAlign.Center
-                            )
-                            
-                            Spacer(modifier = Modifier.height(8.dp))
-                            
-                            Text(
-                                text = "Start adding schools to your favorites by tapping the heart icon on any school",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        Text(
+                            text = stringResource(R.string.no_favorite_schools),
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center
+                        )
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = stringResource(R.string.add_favorites_instruction),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
             
             else -> {
                 // Favorites list
-                Column {
-                    // Header with count
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "${favoriteSchools.size} Favorite School${if (favoriteSchools.size != 1) "s" else ""}",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // item {
+                    //     // Results count
+                    //     Text(
+                    //         text = "${favoriteSchools.size} favorite ${if (favoriteSchools.size == 1) "school" else "schools"}",
+                    //         style = MaterialTheme.typography.bodyMedium,
+                    //         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    //         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                    //     )
+                    // }
                     
-                    // Schools list
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(
-                            items = favoriteSchools,
-                            key = { it.id }
-                        ) { school ->
-                            SchoolCard(
-                                school = school,
-                                onSchoolClick = { onSchoolClick(it.id) },
-                                onFavoriteClick = { viewModel.removeFromFavorites(it) },
-                                isFavorite = true // All schools in this list are favorites
-                            )
-                        }
+                    items(
+                        items = favoriteSchools,
+                        key = { it.id }
+                    ) { school ->
+                        SchoolListItem(
+                            school = school,
+                            onSchoolClick = { onSchoolClick(it.id) },
+                            onFavoriteClick = { viewModel.removeFromFavorites(it) },
+                            isFavorite = true // All schools in this list are favorites
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.padding(start = 16.dp),
+                            thickness = 0.5.dp,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                        )
                     }
                 }
             }
@@ -224,9 +224,9 @@ fun FavoritesScreen(
     if (showClearConfirmDialog) {
         AlertDialog(
             onDismissRequest = { showClearConfirmDialog = false },
-            title = { Text("Clear All Favorites") },
+            title = { Text(stringResource(R.string.clear_all_favorites)) },
             text = { 
-                Text("Are you sure you want to remove all schools from your favorites? This action cannot be undone.") 
+                Text(stringResource(R.string.clear_all_favorites_confirmation)) 
             },
             confirmButton = {
                 TextButton(
@@ -235,14 +235,14 @@ fun FavoritesScreen(
                         showClearConfirmDialog = false
                     }
                 ) {
-                    Text("Clear All")
+                    Text(stringResource(R.string.clear_all))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showClearConfirmDialog = false }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

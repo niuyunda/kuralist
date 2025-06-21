@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 // import androidx.hilt.navigation.compose.hiltViewModel
+import com.kuralist.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,14 +49,14 @@ fun AuthScreen(
     ) {
         // App Title
         Text(
-            text = "Kuralist",
+            text = stringResource(R.string.kuralist),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
         
         Text(
-            text = "New Zealand School Information",
+            text = stringResource(R.string.app_subtitle),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -84,7 +86,7 @@ fun AuthScreen(
         OutlinedTextField(
             value = email,
             onValueChange = actualViewModel::updateEmail,
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.email)) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
@@ -98,7 +100,7 @@ fun AuthScreen(
         OutlinedTextField(
             value = password,
             onValueChange = actualViewModel::updatePassword,
-            label = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -122,7 +124,7 @@ fun AuthScreen(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = actualViewModel::updateConfirmPassword,
-                label = { Text("Confirm Password") },
+                label = { Text(stringResource(R.string.confirm_password)) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
                     IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
@@ -161,7 +163,7 @@ fun AuthScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-            Text(if (isSignUpMode) "Sign Up" else "Sign In")
+            Text(if (isSignUpMode) stringResource(R.string.sign_up) else stringResource(R.string.login))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -173,9 +175,9 @@ fun AuthScreen(
         ) {
             Text(
                 if (isSignUpMode) 
-                    "Already have an account? Sign In" 
+                    stringResource(R.string.already_have_account)
                 else 
-                    "Don't have an account? Sign Up"
+                    stringResource(R.string.dont_have_account)
             )
         }
 
@@ -185,7 +187,7 @@ fun AuthScreen(
                 onClick = actualViewModel::resetPassword,
                 enabled = !isLoading && email.isNotBlank()
             ) {
-                Text("Forgot Password?")
+                Text(stringResource(R.string.forgot_password))
             }
         }
     }

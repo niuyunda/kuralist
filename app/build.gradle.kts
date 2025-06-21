@@ -5,6 +5,7 @@ plugins {
     // alias(libs.plugins.hilt)
     id("kotlin-kapt")
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -19,6 +20,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Supported locales
+        resConfigs("en", "zh")
 
         // Build config fields
         buildConfigField("String", "SUPABASE_URL", "\"https://wdtdmzptgfmhzdsmnxnl.supabase.co\"")
@@ -91,6 +95,10 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
     
     // Networking
     implementation(libs.retrofit)
