@@ -13,12 +13,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.kuralist.app.features.authentication.AuthViewModel
-import com.kuralist.app.features.favorites.FavoritesScreen
-import com.kuralist.app.features.profile.ProfileScreen
-import com.kuralist.app.features.schoollist.SchoolListScreen
-import com.kuralist.app.features.schoollist.SchoolListViewModel
-import com.kuralist.app.features.schoolmap.MapScreen
+import com.kuralist.app.features.auth.presentation.AuthViewModel
+import com.kuralist.app.features.favorites.presentation.FavoritesScreen
+import com.kuralist.app.features.profile.presentation.ProfileScreen
+import com.kuralist.app.features.schools.list.presentation.SchoolListScreen
+import com.kuralist.app.features.schools.list.presentation.SchoolListViewModel
+import com.kuralist.app.features.schools.map.presentation.MapScreen
 import com.kuralist.app.core.services.SchoolService
 import com.kuralist.app.core.services.FavoritesManager
 import com.kuralist.app.core.services.database.SchoolDatabase
@@ -48,7 +48,7 @@ fun MainAppScreen(
     val schoolListViewModel: SchoolListViewModel = viewModel { SchoolListViewModel(schoolService) }
     
     // Shared filter state for both Schools and Map tabs
-    val sharedFilterState: com.kuralist.app.shared.views.filterbar.SchoolFilterState = viewModel { com.kuralist.app.shared.views.filterbar.SchoolFilterState() }
+    val sharedFilterState: com.kuralist.app.shared.ui.components.filter.SchoolFilterState = viewModel { com.kuralist.app.shared.ui.components.filter.SchoolFilterState() }
     
     // Observe favorite school IDs
     val favoriteSchoolIds by favoritesManager.favoriteSchoolIds.collectAsStateWithLifecycle(emptySet())
@@ -84,7 +84,7 @@ fun MainAppScreen(
     ) { paddingValues ->
         if (selectedSchoolId != null) {
             // Show detail screen
-            com.kuralist.app.features.schooldetail.SchoolDetailScreen(
+            com.kuralist.app.features.schools.detail.presentation.SchoolDetailScreen(
                 schoolId = selectedSchoolId!!,
                 onBack = { selectedSchoolId = null },
                 modifier = Modifier

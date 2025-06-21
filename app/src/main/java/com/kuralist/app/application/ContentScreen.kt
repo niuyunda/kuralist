@@ -7,8 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 // import androidx.hilt.navigation.compose.hiltViewModel
-import com.kuralist.app.features.authentication.AuthScreen
-import com.kuralist.app.features.authentication.AuthViewModel
+import com.kuralist.app.features.auth.presentation.AuthScreen
+import com.kuralist.app.features.auth.presentation.AuthViewModel
 
 @Composable
 fun ContentScreen() {
